@@ -1,0 +1,1169 @@
+<!DOCTYPE html>
+<html lang="ru" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>NEXUS ARCH — Архитектурное проектирование, BIM & 3D Визуализация</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        brand: {
+                            50: '#f7f7f6',
+                            100: '#e5e4e0',
+                            400: '#a39e93',
+                            500: '#b89d72', // architectural warm bronze accent
+                            600: '#9e8258',
+                            900: '#18181b',
+                            950: '#0f0f11',
+                        }
+                    },
+                    fontFamily: {
+                        sans: ['Inter', 'system-ui', '-apple-system', 'sans-serif'],
+                        mono: ['JetBrains Mono', 'monospace'],
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap');
+        
+        /* Custom scrollbar styling */
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #0f0f11;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #27272a;
+            border-radius: 4px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #3f3f46;
+        }
+
+        /* Subtle grid background */
+        .bg-grid-pattern {
+            background-size: 40px 40px;
+            background-image: 
+                linear-gradient(to right, rgba(255, 255, 255, 0.03) 1px, transparent 1px),
+                linear-gradient(to bottom, rgba(255, 255, 255, 0.03) 1px, transparent 1px);
+        }
+
+        /* Custom Range Slider */
+        input[type=range] {
+            -webkit-appearance: none;
+            background: #27272a;
+            border-radius: 9999px;
+            height: 6px;
+        }
+        input[type=range]::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            height: 20px;
+            width: 20px;
+            border-radius: 50%;
+            background: #b89d72;
+            cursor: pointer;
+            box-shadow: 0 0 10px rgba(184, 157, 114, 0.5);
+            transition: transform 0.1s ease;
+        }
+        input[type=range]::-webkit-slider-thumb:hover {
+            transform: scale(1.15);
+        }
+    </style>
+</head>
+<body class="bg-zinc-950 text-zinc-100 font-sans antialiased selection:bg-brand-500 selection:text-zinc-950 min-h-screen flex flex-col justify-between">
+
+    <!-- Header Navigation -->
+    <header class="fixed top-0 left-0 right-0 z-40 bg-zinc-950/80 backdrop-blur-md border-b border-zinc-800/80 transition-all duration-300" id="navbar">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-20 flex items-center justify-between">
+            <!-- Brand Logo -->
+            <a href="#" class="flex items-center gap-3 group">
+                <div class="w-9 h-9 border border-brand-500/60 flex items-center justify-center bg-zinc-900 group-hover:border-brand-500 transition-colors">
+                    <span class="text-brand-500 font-mono font-bold text-lg">N</span>
+                </div>
+                <div class="flex flex-col">
+                    <span class="font-bold tracking-widest text-base text-zinc-100 uppercase">NEXUS<span class="text-brand-500">.</span>ARCH</span>
+                    <span class="text-[10px] text-zinc-400 font-mono tracking-wider">STUDIO & BIM LAB</span>
+                </div>
+            </a>
+
+            <!-- Desktop Nav Links -->
+            <nav class="hidden md:flex items-center space-x-8 text-sm font-medium text-zinc-300">
+                <a href="#portfolio" class="hover:text-brand-500 transition-colors">Портфолио</a>
+                <a href="#services" class="hover:text-brand-500 transition-colors">Услуги и Цены</a>
+                <a href="#process" class="hover:text-brand-500 transition-colors">Этапы работы</a>
+                <a href="#calculator" class="hover:text-brand-500 transition-colors">Калькулятор</a>
+                <a href="#contacts" class="hover:text-brand-500 transition-colors">Контакты</a>
+            </nav>
+
+            <!-- Action Button Header -->
+            <div class="hidden sm:flex items-center gap-4">
+                <a href="#calculator" class="inline-flex items-center justify-center px-5 py-2.5 text-xs font-semibold uppercase tracking-wider text-zinc-950 bg-brand-500 hover:bg-brand-600 transition-all rounded-sm shadow-lg shadow-brand-500/10">
+                    Рассчитать стоимость
+                </a>
+            </div>
+
+            <!-- Mobile Menu Toggle Button -->
+            <button id="mobile-menu-btn" class="md:hidden text-zinc-300 hover:text-white p-2" aria-label="Открыть меню">
+                <svg id="menu-icon-open" class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"/>
+                </svg>
+                <svg id="menu-icon-close" class="w-6 h-6 hidden" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+                </svg>
+            </button>
+        </div>
+
+        <!-- Mobile Drawer -->
+        <div id="mobile-menu" class="hidden md:hidden bg-zinc-900 border-b border-zinc-800 px-6 py-6 space-y-4">
+            <a href="#portfolio" class="block text-zinc-200 font-medium hover:text-brand-500 py-1 mobile-link">Портфолио</a>
+            <a href="#services" class="block text-zinc-200 font-medium hover:text-brand-500 py-1 mobile-link">Услуги и Цены</a>
+            <a href="#process" class="block text-zinc-200 font-medium hover:text-brand-500 py-1 mobile-link">Этапы работы</a>
+            <a href="#calculator" class="block text-zinc-200 font-medium hover:text-brand-500 py-1 mobile-link">Калькулятор</a>
+            <a href="#contacts" class="block text-zinc-200 font-medium hover:text-brand-500 py-1 mobile-link">Контакты</a>
+            <div class="pt-4 border-t border-zinc-800">
+                <a href="#calculator" class="block text-center w-full py-3 text-xs font-semibold uppercase tracking-wider text-zinc-950 bg-brand-500 rounded-sm">
+                    Рассчитать стоимость
+                </a>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Content Body -->
+    <main class="pt-20">
+        
+        <!-- HERO SECTION -->
+        <section class="relative min-h-[90vh] flex items-center justify-center border-b border-zinc-800/80 bg-grid-pattern overflow-hidden py-16">
+            <!-- Subtle Radial Gradient Background Layer -->
+            <div class="absolute inset-0 bg-gradient-to-t from-zinc-950 via-transparent to-zinc-950/60 pointer-events-none"></div>
+            <div class="absolute -top-40 left-1/2 -translate-x-1/2 w-[600px] h-[600px] bg-brand-500/10 rounded-full blur-[120px] pointer-events-none"></div>
+
+            <div class="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 grid lg:grid-cols-12 gap-12 items-center">
+                
+                <!-- Left Text Column -->
+                <div class="lg:col-span-7 space-y-8 text-left">
+                    <div class="inline-flex items-center gap-2 px-3 py-1.5 rounded-full border border-brand-500/30 bg-brand-500/5 text-brand-500 text-xs font-mono">
+                        <span class="w-2 h-2 rounded-full bg-brand-500 animate-pulse"></span>
+                        <span>ПРИЕМ ЗАКАЗОВ НА 2026-2027 ГОД</span>
+                    </div>
+
+                    <h1 class="text-4xl sm:text-5xl lg:text-6xl font-light tracking-tight text-white leading-[1.15]">
+                        Архитектура <br class="hidden sm:inline">
+                        <span class="font-semibold italic text-brand-500">чистых форм</span> и высшего стандарта BIM.
+                    </h1>
+
+                    <p class="text-base sm:text-lg text-zinc-400 max-w-2xl font-light leading-relaxed">
+                        Проектируем частные дома, коммерческие объекты и интерьеры. 
+                        Сквозной процесс: от концепции и 3D-облёта до полной рабочей документации в Revit и авторского надзора.
+                    </p>
+
+                    <!-- CTAs & Trust Badges -->
+                    <div class="flex flex-col sm:flex-row items-stretch sm:items-center gap-4 pt-2">
+                        <a href="#calculator" class="inline-flex items-center justify-center px-8 py-4 text-xs font-semibold uppercase tracking-widest text-zinc-950 bg-brand-500 hover:bg-brand-600 transition-all rounded-sm shadow-xl shadow-brand-500/20 group">
+                            <span>Заказать расчёт проекта</span>
+                            <svg class="w-4 h-4 ml-2 group-hover:translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"/>
+                            </svg>
+                        </a>
+                        <a href="#portfolio" class="inline-flex items-center justify-center px-8 py-4 text-xs font-semibold uppercase tracking-widest text-zinc-300 border border-zinc-700 hover:border-zinc-400 hover:text-white transition-all rounded-sm bg-zinc-900/50">
+                            Смотреть портфолио
+                        </a>
+                    </div>
+
+                    <!-- Metric Badges -->
+                    <div class="grid grid-cols-3 gap-6 pt-8 border-t border-zinc-800/80">
+                        <div>
+                            <p class="text-2xl sm:text-3xl font-mono font-bold text-white">120+</p>
+                            <p class="text-xs text-zinc-400 mt-1">Реализованных проектов</p>
+                        </div>
+                        <div>
+                            <p class="text-2xl sm:text-3xl font-mono font-bold text-white">LOD 400</p>
+                            <p class="text-xs text-zinc-400 mt-1">Детализация BIM моделей</p>
+                        </div>
+                        <div>
+                            <p class="text-2xl sm:text-3xl font-mono font-bold text-white">100%</p>
+                            <p class="text-xs text-zinc-400 mt-1">Соблюдение нормативов</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Right Visual Column (Architectural Showcase Banner) -->
+                <div class="lg:col-span-5 relative">
+                    <div class="relative mx-auto max-w-md lg:max-w-none rounded-lg overflow-hidden border border-zinc-800 shadow-2xl bg-zinc-900 group">
+                        <img src="https://images.unsplash.com/photo-1600585154340-be6161a56a0c?auto=format&fit=crop&w=1200&q=80" 
+                             alt="Архитектурный проект виллы" 
+                             class="w-full h-[420px] object-cover object-center group-hover:scale-105 transition-transform duration-700 opacity-90">
+                        
+                        <div class="absolute inset-0 bg-gradient-to-t from-zinc-950 via-zinc-950/20 to-transparent"></div>
+
+                        <div class="absolute bottom-6 left-6 right-6 p-4 bg-zinc-900/90 backdrop-blur-md border border-zinc-800 rounded-sm">
+                            <div class="flex justify-between items-start mb-2">
+                                <div>
+                                    <span class="text-[10px] font-mono text-brand-500 uppercase tracking-widest">Проект месяца</span>
+                                    <h3 class="text-sm font-semibold text-white">Villa Minimalis — 450 м²</h3>
+                                </div>
+                                <span class="px-2 py-0.5 bg-zinc-800 text-[10px] font-mono text-zinc-300 rounded">BIM + Corona</span>
+                            </div>
+                            <p class="text-xs text-zinc-400">Частная резиденция с консольным этажом и панорамным остеклением.</p>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </section>
+
+
+        <!-- PORTFOLIO / EXAMPLES GALLERY WITH FILTERS -->
+        <section id="portfolio" class="py-24 border-b border-zinc-800 bg-zinc-950">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                
+                <!-- Section Header -->
+                <div class="flex flex-col md:flex-row md:items-end justify-between mb-12 gap-6">
+                    <div>
+                        <div class="text-xs font-mono text-brand-500 uppercase tracking-widest mb-2">// Избранные работы</div>
+                        <h2 class="text-3xl sm:text-4xl font-light text-white">Портфолио проектов</h2>
+                    </div>
+
+                    <!-- Category Filter Buttons -->
+                    <div class="flex flex-wrap gap-2 text-xs font-mono" id="portfolio-filters">
+                        <button data-filter="all" class="filter-btn active px-4 py-2 border border-brand-500 bg-brand-500 text-zinc-950 font-semibold transition-all rounded-sm">
+                            Все (6)
+                        </button>
+                        <button data-filter="residential" class="filter-btn px-4 py-2 border border-zinc-800 bg-zinc-900 text-zinc-400 hover:text-white hover:border-zinc-700 transition-all rounded-sm">
+                            Частные дома
+                        </button>
+                        <button data-filter="visualization" class="filter-btn px-4 py-2 border border-zinc-800 bg-zinc-900 text-zinc-400 hover:text-white hover:border-zinc-700 transition-all rounded-sm">
+                            3D Визуализация
+                        </button>
+                        <button data-filter="bim" class="filter-btn px-4 py-2 border border-zinc-800 bg-zinc-900 text-zinc-400 hover:text-white hover:border-zinc-700 transition-all rounded-sm">
+                            BIM & Revit
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Projects Grid -->
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8" id="projects-grid">
+                    
+                    <!-- Project 1 -->
+                    <div class="project-card group cursor-pointer border border-zinc-800/80 bg-zinc-900 rounded-sm overflow-hidden" data-category="residential visualization" onclick="openProjectModal(1)">
+                        <div class="relative overflow-hidden aspect-[4/3]">
+                            <img src="https://images.unsplash.com/photo-1600596542815-ffad4c1539a9?auto=format&fit=crop&w=800&q=80" alt="Residence Mono" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500">
+                            <div class="absolute inset-0 bg-zinc-950/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
+                                <span class="px-4 py-2 text-xs font-mono text-zinc-950 bg-brand-500 font-semibold uppercase tracking-wider rounded-sm">Детали проекта</span>
+                            </div>
+                        </div>
+                        <div class="p-6">
+                            <div class="flex justify-between items-baseline mb-2">
+                                <h3 class="text-lg font-medium text-white group-hover:text-brand-500 transition-colors">Residence Mono</h3>
+                                <span class="text-xs font-mono text-zinc-400">320 м²</span>
+                            </div>
+                            <p class="text-xs text-zinc-400 line-clamp-2 mb-4">Современный двухэтажный жилой дом из монолитного бетона с террасой на крыше.</p>
+                            <div class="flex items-center gap-2 text-[10px] font-mono text-brand-500">
+                                <span class="px-2 py-0.5 bg-zinc-800 rounded">Частный дом</span>
+                                <span class="px-2 py-0.5 bg-zinc-800 rounded">3D Визуализация</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Project 2 -->
+                    <div class="project-card group cursor-pointer border border-zinc-800/80 bg-zinc-900 rounded-sm overflow-hidden" data-category="bim residential" onclick="openProjectModal(2)">
+                        <div class="relative overflow-hidden aspect-[4/3]">
+                            <img src="https://images.unsplash.com/photo-1512917774080-9991f1c4c750?auto=format&fit=crop&w=800&q=80" alt="Nordic Timber House" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500">
+                            <div class="absolute inset-0 bg-zinc-950/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
+                                <span class="px-4 py-2 text-xs font-mono text-zinc-950 bg-brand-500 font-semibold uppercase tracking-wider rounded-sm">Детали проекта</span>
+                            </div>
+                        </div>
+                        <div class="p-6">
+                            <div class="flex justify-between items-baseline mb-2">
+                                <h3 class="text-lg font-medium text-white group-hover:text-brand-500 transition-colors">Nordic Cabin Suite</h3>
+                                <span class="text-xs font-mono text-zinc-400">180 м²</span>
+                            </div>
+                            <p class="text-xs text-zinc-400 line-clamp-2 mb-4">Минималистичный барнхаус со сложным рельефом, разработанный по BIM-технологии в Revit.</p>
+                            <div class="flex items-center gap-2 text-[10px] font-mono text-brand-500">
+                                <span class="px-2 py-0.5 bg-zinc-800 rounded">BIM Pro</span>
+                                <span class="px-2 py-0.5 bg-zinc-800 rounded">Частный дом</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Project 3 -->
+                    <div class="project-card group cursor-pointer border border-zinc-800/80 bg-zinc-900 rounded-sm overflow-hidden" data-category="visualization" onclick="openProjectModal(3)">
+                        <div class="relative overflow-hidden aspect-[4/3]">
+                            <img src="https://images.unsplash.com/photo-1600607687939-ce8a6c25118c?auto=format&fit=crop&w=800&q=80" alt="Villa Horizon Render" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500">
+                            <div class="absolute inset-0 bg-zinc-950/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
+                                <span class="px-4 py-2 text-xs font-mono text-zinc-950 bg-brand-500 font-semibold uppercase tracking-wider rounded-sm">Детали проекта</span>
+                            </div>
+                        </div>
+                        <div class="p-6">
+                            <div class="flex justify-between items-baseline mb-2">
+                                <h3 class="text-lg font-medium text-white group-hover:text-brand-500 transition-colors">Villa Horizon</h3>
+                                <span class="text-xs font-mono text-zinc-400">540 м²</span>
+                            </div>
+                            <p class="text-xs text-zinc-400 line-clamp-2 mb-4">Премиальная визуализация экстерьера и ландшафтного окружения для девелоперского объекта.</p>
+                            <div class="flex items-center gap-2 text-[10px] font-mono text-brand-500">
+                                <span class="px-2 py-0.5 bg-zinc-800 rounded">3D Визуализация</span>
+                                <span class="px-2 py-0.5 bg-zinc-800 rounded">4K Renders</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Project 4 -->
+                    <div class="project-card group cursor-pointer border border-zinc-800/80 bg-zinc-900 rounded-sm overflow-hidden" data-category="bim" onclick="openProjectModal(4)">
+                        <div class="relative overflow-hidden aspect-[4/3]">
+                            <img src="https://images.unsplash.com/photo-1503387762-592deb58ef4e?auto=format&fit=crop&w=800&q=80" alt="BIM Structural Hub" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500">
+                            <div class="absolute inset-0 bg-zinc-950/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
+                                <span class="px-4 py-2 text-xs font-mono text-zinc-950 bg-brand-500 font-semibold uppercase tracking-wider rounded-sm">Детали проекта</span>
+                            </div>
+                        </div>
+                        <div class="p-6">
+                            <div class="flex justify-between items-baseline mb-2">
+                                <h3 class="text-lg font-medium text-white group-hover:text-brand-500 transition-colors">BIM Office Pavilion</h3>
+                                <span class="text-xs font-mono text-zinc-400">1200 м²</span>
+                            </div>
+                            <p class="text-xs text-zinc-400 line-clamp-2 mb-4">Полная коллизионная проверка и BIM-моделирование раздела АР+КР для коммерческого павильона.</p>
+                            <div class="flex items-center gap-2 text-[10px] font-mono text-brand-500">
+                                <span class="px-2 py-0.5 bg-zinc-800 rounded">BIM & Revit</span>
+                                <span class="px-2 py-0.5 bg-zinc-800 rounded">АР + КР</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Project 5 -->
+                    <div class="project-card group cursor-pointer border border-zinc-800/80 bg-zinc-900 rounded-sm overflow-hidden" data-category="residential visualization" onclick="openProjectModal(5)">
+                        <div class="relative overflow-hidden aspect-[4/3]">
+                            <img src="https://images.unsplash.com/photo-1600210492486-724fe5c67fb0?auto=format&fit=crop&w=800&q=80" alt="Glasshouse Loft" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500">
+                            <div class="absolute inset-0 bg-zinc-950/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
+                                <span class="px-4 py-2 text-xs font-mono text-zinc-950 bg-brand-500 font-semibold uppercase tracking-wider rounded-sm">Детали проекта</span>
+                            </div>
+                        </div>
+                        <div class="p-6">
+                            <div class="flex justify-between items-baseline mb-2">
+                                <h3 class="text-lg font-medium text-white group-hover:text-brand-500 transition-colors">Glasshouse Residence</h3>
+                                <span class="text-xs font-mono text-zinc-400">290 м²</span>
+                            </div>
+                            <p class="text-xs text-zinc-400 line-clamp-2 mb-4">Интеграция природы и внутреннего пространства с помощью панорамных порталов и атриума.</p>
+                            <div class="flex items-center gap-2 text-[10px] font-mono text-brand-500">
+                                <span class="px-2 py-0.5 bg-zinc-800 rounded">Частный дом</span>
+                                <span class="px-2 py-0.5 bg-zinc-800 rounded">3D Визуализация</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Project 6 -->
+                    <div class="project-card group cursor-pointer border border-zinc-800/80 bg-zinc-900 rounded-sm overflow-hidden" data-category="bim residential" onclick="openProjectModal(6)">
+                        <div class="relative overflow-hidden aspect-[4/3]">
+                            <img src="https://images.unsplash.com/photo-1600585152220-90363fe7e115?auto=format&fit=crop&w=800&q=80" alt="Atrium Villa" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500">
+                            <div class="absolute inset-0 bg-zinc-950/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
+                                <span class="px-4 py-2 text-xs font-mono text-zinc-950 bg-brand-500 font-semibold uppercase tracking-wider rounded-sm">Детали проекта</span>
+                            </div>
+                        </div>
+                        <div class="p-6">
+                            <div class="flex justify-between items-baseline mb-2">
+                                <h3 class="text-lg font-medium text-white group-hover:text-brand-500 transition-colors">Atrium Courtyard</h3>
+                                <span class="text-xs font-mono text-zinc-400">410 м²</span>
+                            </div>
+                            <p class="text-xs text-zinc-400 line-clamp-2 mb-4">Закрытый внутренний двор с закрытым контуром приватности и минималистичным водоёмом.</p>
+                            <div class="flex items-center gap-2 text-[10px] font-mono text-brand-500">
+                                <span class="px-2 py-0.5 bg-zinc-800 rounded">Частный дом</span>
+                                <span class="px-2 py-0.5 bg-zinc-800 rounded">BIM Revit</span>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+        </section>
+
+
+        <!-- PRICING & PACKAGES SECTION -->
+        <section id="services" class="py-24 border-b border-zinc-800 bg-zinc-900/50">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                
+                <div class="text-center max-w-3xl mx-auto mb-16">
+                    <div class="text-xs font-mono text-brand-500 uppercase tracking-widest mb-2">// Прозрачное ценообразование</div>
+                    <h2 class="text-3xl sm:text-4xl font-light text-white mb-4">Услуги и Тарифные Пакеты</h2>
+                    <p class="text-sm text-zinc-400">Четкие спецификации и готовые комплекты документации без скрытых платежей.</p>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+                    
+                    <!-- Tariff 1 -->
+                    <div class="border border-zinc-800 bg-zinc-950 p-8 flex flex-col justify-between rounded-sm hover:border-zinc-700 transition-all">
+                        <div>
+                            <div class="text-xs font-mono text-zinc-400 uppercase tracking-wider mb-2">Старт</div>
+                            <h3 class="text-xl font-semibold text-white mb-4">Эскизный проект (ЭП)</h3>
+                            <div class="mb-6">
+                                <span class="text-3xl font-mono font-bold text-white">1 800 ₽</span>
+                                <span class="text-xs text-zinc-400">/ м²</span>
+                            </div>
+                            <p class="text-xs text-zinc-400 mb-6 pb-6 border-b border-zinc-800">
+                                Идеально для формирования концепции, посадки здания на участок и подачи на согласование.
+                            </p>
+
+                            <ul class="space-y-3 text-xs text-zinc-300 mb-8">
+                                <li class="flex items-center gap-3">
+                                    <svg class="w-4 h-4 text-brand-500 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>
+                                    <span>Схема генплана (ПЗУОФ)</span>
+                                </li>
+                                <li class="flex items-center gap-3">
+                                    <svg class="w-4 h-4 text-brand-500 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>
+                                    <span>Кладочные планировки этажей</span>
+                                </li>
+                                <li class="flex items-center gap-3">
+                                    <svg class="w-4 h-4 text-brand-500 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>
+                                    <span>4 ракурса 3D-визуализации фасадов</span>
+                                </li>
+                                <li class="flex items-center gap-3">
+                                    <svg class="w-4 h-4 text-brand-500 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>
+                                    <span>Основные разрезы и фасадные высоты</span>
+                                </li>
+                            </ul>
+                        </div>
+
+                        <a href="#calculator" onclick="selectPackage('concept')" class="w-full py-3 text-center text-xs font-mono font-semibold uppercase tracking-widest border border-zinc-700 text-zinc-200 hover:bg-zinc-800 hover:text-white transition-all rounded-sm">
+                            Выбрать Эскизный
+                        </a>
+                    </div>
+
+                    <!-- Tariff 2 (Featured) -->
+                    <div class="border-2 border-brand-500 bg-zinc-950 p-8 flex flex-col justify-between rounded-sm relative shadow-2xl shadow-brand-500/10">
+                        <div class="absolute -top-3 left-1/2 -translate-x-1/2 px-3 py-1 bg-brand-500 text-zinc-950 text-[10px] font-mono font-bold uppercase tracking-widest rounded-full">
+                            Хит продаж
+                        </div>
+
+                        <div>
+                            <div class="text-xs font-mono text-brand-500 uppercase tracking-wider mb-2">Стандарт BIM</div>
+                            <h3 class="text-xl font-semibold text-white mb-4">Архитектурный (АР)</h3>
+                            <div class="mb-6">
+                                <span class="text-3xl font-mono font-bold text-white">30$</span>
+                                <span class="text-xs text-zinc-400">/ м²</span>
+                            </div>
+                            <p class="text-xs text-zinc-400 mb-6 pb-6 border-b border-zinc-800">
+                                Полный рабочий комплект чертежей для строительства с детальной спецификацией материалов.
+                            </p>
+
+                            <ul class="space-y-3 text-xs text-zinc-300 mb-8">
+                                <li class="flex items-center gap-3">
+                                    <svg class="w-4 h-4 text-brand-500 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>
+                                    <span class="font-medium text-white">Всё из пакета «Эскизный»</span>
+                                </li>
+                                <li class="flex items-center gap-3">
+                                    <svg class="w-4 h-4 text-brand-500 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>
+                                    <span>3D модель Revit (LOD 300)</span>
+                                </li>
+                                <li class="flex items-center gap-3">
+                                    <svg class="w-4 h-4 text-brand-500 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>
+                                    <span>Ведомости окон, дверей и материалов</span>
+                                </li>
+                                <li class="flex items-center gap-3">
+                                    <svg class="w-4 h-4 text-brand-500 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>
+                                    <span>Узлы примыканий и утепления</span>
+                                </li>
+                                <li class="flex items-center gap-3">
+                                    <svg class="w-4 h-4 text-brand-500 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>
+                                    <span>8 Фотореалистичных рендеров</span>
+                                </li>
+                            </ul>
+                        </div>
+
+                        <a href="#calculator" onclick="selectPackage('ar')" class="w-full py-3.5 text-center text-xs font-mono font-semibold uppercase tracking-widest bg-brand-500 text-zinc-950 hover:bg-brand-600 transition-all rounded-sm shadow-md">
+                            Выбрать Архитектурный
+                        </a>
+                    </div>
+
+                    <!-- Tariff 3 -->
+                    <div class="border border-zinc-800 bg-zinc-950 p-8 flex flex-col justify-between rounded-sm hover:border-zinc-700 transition-all">
+                        <div>
+                            <div class="text-xs font-mono text-zinc-400 uppercase tracking-wider mb-2">Под Ключ</div>
+                            <h3 class="text-xl font-semibold text-white mb-4">Комплексный (АР + КР)</h3>
+                            <div class="mb-6">
+                                <span class="text-3xl font-mono font-bold text-white">450 $</span>
+                                <span class="text-xs text-zinc-400">/ м²</span>
+                            </div>
+                            <p class="text-xs text-zinc-400 mb-6 pb-6 border-b border-zinc-800">
+                                Полный инженерно-архитектурный проект для надежного возведения и сдачи объекта.
+                            </p>
+
+                            <ul class="space-y-3 text-xs text-zinc-300 mb-8">
+                                <li class="flex items-center gap-3">
+                                    <svg class="w-4 h-4 text-brand-500 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>
+                                    <span class="font-medium text-white">Всё из пакета «Архитектурный»</span>
+                                </li>
+                                <li class="flex items-center gap-3">
+                                    <svg class="w-4 h-4 text-brand-500 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>
+                                    <span>Конструктивные решения (КР/КЖ)</span>
+                                </li>
+                                <li class="flex items-center gap-3">
+                                    <svg class="w-4 h-4 text-brand-500 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>
+                                    <span>Расчёт нагрузок и фундамента</span>
+                                </li>
+                                <li class="flex items-center gap-3">
+                                    <svg class="w-4 h-4 text-brand-500 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>
+                                    <span>3D Анимационный видео-облёт</span>
+                                </li>
+                                <li class="flex items-center gap-3">
+                                    <svg class="w-4 h-4 text-brand-500 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>
+                                    <span>2 месяца авторского надзора</span>
+                                </li>
+                            </ul>
+                        </div>
+
+                        <a href="#calculator" onclick="selectPackage('full')" class="w-full py-3 text-center text-xs font-mono font-semibold uppercase tracking-widest border border-zinc-700 text-zinc-200 hover:bg-zinc-800 hover:text-white transition-all rounded-sm">
+                            Выбрать Комплексный
+                        </a>
+                    </div>
+
+                </div>
+            </div>
+        </section>
+
+
+        <!-- WORKFLOW / PROCESS SECTION -->
+        <section id="process" class="py-24 border-b border-zinc-800 bg-zinc-950">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                
+                <div class="mb-16">
+                    <div class="text-xs font-mono text-brand-500 uppercase tracking-widest mb-2">// Алгоритм работы</div>
+                    <h2 class="text-3xl sm:text-4xl font-light text-white">5 шагов от идеи до реализации</h2>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-5 gap-6">
+                    
+                    <!-- Step 1 -->
+                    <div class="p-6 border border-zinc-800/80 bg-zinc-900/40 rounded-sm relative group hover:border-brand-500/50 transition-colors">
+                        <span class="text-3xl font-mono font-bold text-zinc-700 group-hover:text-brand-500 transition-colors mb-4 block">01</span>
+                        <h4 class="text-base font-semibold text-white mb-2">Бриф и ТЗ</h4>
+                        <p class="text-xs text-zinc-400">Сбор пожеланий, анализ участка, топосъемка и составление подробного технического задания.</p>
+                    </div>
+
+                    <!-- Step 2 -->
+                    <div class="p-6 border border-zinc-800/80 bg-zinc-900/40 rounded-sm relative group hover:border-brand-500/50 transition-colors">
+                        <span class="text-3xl font-mono font-bold text-zinc-700 group-hover:text-brand-500 transition-colors mb-4 block">02</span>
+                        <h4 class="text-base font-semibold text-white mb-2">Концепт</h4>
+                        <p class="text-xs text-zinc-400">Разработка 2-3 вариантов планировок, посадка здания на геоподоснову и объемное эскизирование.</p>
+                    </div>
+
+                    <!-- Step 3 -->
+                    <div class="p-6 border border-zinc-800/80 bg-zinc-900/40 rounded-sm relative group hover:border-brand-500/50 transition-colors">
+                        <span class="text-3xl font-mono font-bold text-zinc-700 group-hover:text-brand-500 transition-colors mb-4 block">03</span>
+                        <h4 class="text-base font-semibold text-white mb-2">3D Рендеринг</h4>
+                        <p class="text-xs text-zinc-400">Настройка материалов, фасадных текстур и света. Фотореалистичная визуализация объекта.</p>
+                    </div>
+
+                    <!-- Step 4 -->
+                    <div class="p-6 border border-zinc-800/80 bg-zinc-900/40 rounded-sm relative group hover:border-brand-500/50 transition-colors">
+                        <span class="text-3xl font-mono font-bold text-zinc-700 group-hover:text-brand-500 transition-colors mb-4 block">04</span>
+                        <h4 class="text-base font-semibold text-white mb-2">BIM Документы</h4>
+                        <p class="text-xs text-zinc-400">Выпуск полного пакета рабочих чертежей АР/КР в Revit со спецификациями материалов.</p>
+                    </div>
+
+                    <!-- Step 5 -->
+                    <div class="p-6 border border-zinc-800/80 bg-zinc-900/40 rounded-sm relative group hover:border-brand-500/50 transition-colors">
+                        <span class="text-3xl font-mono font-bold text-zinc-700 group-hover:text-brand-500 transition-colors mb-4 block">05</span>
+                        <h4 class="text-base font-semibold text-white mb-2">Надзор</h4>
+                        <p class="text-xs text-zinc-400">Передача альбомов строителям, консультации и авторский контроль точности реализации.</p>
+                    </div>
+
+                </div>
+            </div>
+        </section>
+
+
+        <!-- INTERACTIVE CALCULATOR & ORDER FORM -->
+        <section id="calculator" class="py-24 border-b border-zinc-800 bg-zinc-950 bg-grid-pattern relative">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                
+                <div class="grid lg:grid-cols-12 gap-12 items-start">
+                    
+                    <!-- Left Form Information -->
+                    <div class="lg:col-span-5 space-y-6">
+                        <div class="text-xs font-mono text-brand-500 uppercase tracking-widest">// Онлайновый расчёт</div>
+                        <h2 class="text-3xl sm:text-4xl font-light text-white">Рассчитайте стоимость и закажите проект</h2>
+                        <p class="text-sm text-zinc-400 leading-relaxed">
+                            Укажите примерную площадь вашего объекта, выберите нужный комплект и дополнительные опции. 
+                            Мы подготовим детальную смету и свяжемся с вами в течение 30 минут.
+                        </p>
+
+                        <!-- Highlights List -->
+                        <div class="space-y-4 pt-4">
+                            <div class="flex items-start gap-4">
+                                <div class="w-8 h-8 rounded border border-brand-500/40 bg-brand-500/10 flex items-center justify-center text-brand-500 font-mono text-xs">01</div>
+                                <div>
+                                    <h4 class="text-sm font-semibold text-white">Фиксированная смета</h4>
+                                    <p class="text-xs text-zinc-400">Цена в договоре не меняется в ходе проектирования.</p>
+                                </div>
+                            </div>
+                            <div class="flex items-start gap-4">
+                                <div class="w-8 h-8 rounded border border-brand-500/40 bg-brand-500/10 flex items-center justify-center text-brand-500 font-mono text-xs">02</div>
+                                <div>
+                                    <h4 class="text-sm font-semibold text-white">Работа по договору</h4>
+                                    <p class="text-xs text-zinc-400">Поэтапная оплата (40% / 30% / 30%) по безналичному расчету или ИНН.</p>
+                                </div>
+                            </div>
+                            <div class="flex items-start gap-4">
+                                <div class="w-8 h-8 rounded border border-brand-500/40 bg-brand-500/10 flex items-center justify-center text-brand-500 font-mono text-xs">03</div>
+                                <div>
+                                    <h4 class="text-sm font-semibold text-white">Форматы выдачи</h4>
+                                    <p class="text-xs text-zinc-400">PDF альбом А3, модели DWG, IFC, 3Ds Max, BIM Revit.</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Right Form Card -->
+                    <div class="lg:col-span-7 bg-zinc-900 border border-zinc-800 p-6 sm:p-8 rounded-sm shadow-2xl">
+                        <form id="order-form" onsubmit="handleFormSubmit(event)" class="space-y-6">
+                            
+                            <!-- Step 1: Object Type -->
+                            <div>
+                                <label class="block text-xs font-mono uppercase text-zinc-400 mb-3">1. Тип объекта</label>
+                                <div class="grid grid-cols-2 sm:grid-cols-4 gap-3">
+                                    <label class="cursor-pointer">
+                                        <input type="radio" name="project_type" value="house" checked onchange="calculateTotal()" class="peer hidden">
+                                        <div class="p-3 text-center border border-zinc-800 bg-zinc-950 peer-checked:border-brand-500 peer-checked:text-brand-500 peer-checked:bg-brand-500/5 text-xs text-zinc-300 rounded-sm transition-all">
+                                            Частный дом
+                                        </div>
+                                    </label>
+                                    <label class="cursor-pointer">
+                                        <input type="radio" name="project_type" value="commercial" onchange="calculateTotal()" class="peer hidden">
+                                        <div class="p-3 text-center border border-zinc-800 bg-zinc-950 peer-checked:border-brand-500 peer-checked:text-brand-500 peer-checked:bg-brand-500/5 text-xs text-zinc-300 rounded-sm transition-all">
+                                            Коммерция
+                                        </div>
+                                    </label>
+                                    <label class="cursor-pointer">
+                                        <input type="radio" name="project_type" value="interior" onchange="calculateTotal()" class="peer hidden">
+                                        <div class="p-3 text-center border border-zinc-800 bg-zinc-950 peer-checked:border-brand-500 peer-checked:text-brand-500 peer-checked:bg-brand-500/5 text-xs text-zinc-300 rounded-sm transition-all">
+                                            Интерьер
+                                        </div>
+                                    </label>
+                                    <label class="cursor-pointer">
+                                        <input type="radio" name="project_type" value="vis" onchange="calculateTotal()" class="peer hidden">
+                                        <div class="p-3 text-center border border-zinc-800 bg-zinc-950 peer-checked:border-brand-500 peer-checked:text-brand-500 peer-checked:bg-brand-500/5 text-xs text-zinc-300 rounded-sm transition-all">
+                                            Только 3D Vis
+                                        </div>
+                                    </label>
+                                </div>
+                            </div>
+
+                            <!-- Step 2: Area Slider -->
+                            <div>
+                                <div class="flex justify-between items-center mb-2">
+                                    <label class="text-xs font-mono uppercase text-zinc-400">2. Площадь объекта (м²)</label>
+                                    <span id="area-val" class="text-lg font-mono font-bold text-brand-500">250 м²</span>
+                                </div>
+                                <input type="range" id="area-range" min="50" max="1000" step="10" value="250" oninput="updateArea(this.value)" class="w-full">
+                                <div class="flex justify-between text-[10px] font-mono text-zinc-500 mt-1">
+                                    <span>50 м²</span>
+                                    <span>500 м²</span>
+                                    <span>1000+ м²</span>
+                                </div>
+                            </div>
+
+                            <!-- Step 3: Tariff Selection -->
+                            <div>
+                                <label class="block text-xs font-mono uppercase text-zinc-400 mb-3">3. Пакет проектирования</label>
+                                <select id="package-select" onchange="calculateTotal()" class="w-full bg-zinc-950 border border-zinc-800 text-zinc-200 text-sm rounded-sm p-3 focus:outline-none focus:border-brand-500">
+                                    <option value="concept">Эскизный проект (20$/м²)</option>
+                                    <option value="ar" selected>Архитектурный проект АР/BIM (30$ ₽/м²)</option>
+                                    <option value="full">Комплексный АР+КР (45$ ₽/м²)</option>
+                                </select>
+                            </div>
+
+                            <!-- Step 4: Additional Options -->
+                            <div>
+                                <label class="block text-xs font-mono uppercase text-zinc-400 mb-3">4. Дополнительные опции</label>
+                                <div class="space-y-2 text-xs">
+                                    <label class="flex items-center gap-3 cursor-pointer p-2 rounded bg-zinc-950/60 hover:bg-zinc-950 transition-colors border border-zinc-800/50">
+                                        <input type="checkbox" id="opt-surveillance" onchange="calculateTotal()" class="accent-brand-500 rounded">
+                                        <span class="text-zinc-300">Авторский надзор за стройкой (+ 450 $/мес)</span>
+                                    </label>
+                                    <label class="flex items-center gap-3 cursor-pointer p-2 rounded bg-zinc-950/60 hover:bg-zinc-950 transition-colors border border-zinc-800/50">
+                                        <input type="checkbox" id="opt-video" onchange="calculateTotal()" class="accent-brand-500 rounded">
+                                        <span class="text-zinc-300">Анимационный видео-облёт 4K (+ 350 $)</span>
+                                    </label>
+                                </div>
+                            </div>
+
+                            <!-- Live Price Summary Box -->
+                            <div class="bg-zinc-950 border border-brand-500/40 p-4 rounded-sm flex flex-col sm:flex-row items-center justify-between gap-4">
+                                <div>
+                                    <span class="text-[10px] font-mono text-zinc-400 uppercase">Ориентировочный бюджет:</span>
+                                    <div id="total-price" class="text-2xl sm:text-3xl font-mono font-bold text-white">7250 $</div>
+                                </div>
+                                <div class="text-right sm:text-right text-[11px] text-zinc-400">
+                                    <span id="price-per-m">29 $ / м²</span><br>
+                                    <span>Срок: ~ <strong id="est-time" class="text-zinc-200">25–35 рабочих дней</strong></span>
+                                </div>
+                            </div>
+
+                            <!-- Client Details & Contact Info Inputs -->
+                            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 pt-2">
+                                <div>
+                                    <label class="block text-[11px] font-mono text-zinc-400 mb-1">Ваше имя *</label>
+                                    <input type="text" required id="client-name" placeholder="Александр" class="w-full bg-zinc-950 border border-zinc-800 text-zinc-200 text-xs rounded-sm p-3 focus:outline-none focus:border-brand-500">
+                                </div>
+                                <div>
+                                    <label class="block text-[11px] font-mono text-zinc-400 mb-1">Телефон / Telegram *</label>
+                                    <input type="tel" required id="client-phone" placeholder="+375 (00) 000-00-00" class="w-full bg-zinc-950 border border-zinc-800 text-zinc-200 text-xs rounded-sm p-3 focus:outline-none focus:border-brand-500">
+                                </div>
+                            </div>
+
+                            <div>
+                                <label class="block text-[11px] font-mono text-zinc-400 mb-1">Telegram или Email для связи</label>
+                                <input type="text" id="client-contact" placeholder="@username или mail@example.com" class="w-full bg-zinc-950 border border-zinc-800 text-zinc-200 text-xs rounded-sm p-3 focus:outline-none focus:border-brand-500">
+                            </div>
+
+                            <div>
+                                <label class="block text-[11px] font-mono text-zinc-400 mb-1">Комментарий к проекту (по желанию)</label>
+                                <textarea id="client-comment" rows="2" placeholder="Локация участка, предпочтения по стилю, особые требования..." class="w-full bg-zinc-950 border border-zinc-800 text-zinc-200 text-xs rounded-sm p-3 focus:outline-none focus:border-brand-500"></textarea>
+                            </div>
+
+                            <button type="submit" class="w-full py-4 text-xs font-mono font-bold uppercase tracking-widest text-zinc-950 bg-brand-500 hover:bg-brand-600 transition-all rounded-sm shadow-xl shadow-brand-500/20">
+                                Отправить заявку на проект
+                            </button>
+                            <p class="text-[10px] text-zinc-500 text-center">
+                                Нажимая кнопку, вы соглашаетесь на обработку персональных данных.
+                            </p>
+                        </form>
+                    </div>
+
+                </div>
+
+            </div>
+        </section>
+
+
+        <!-- FAQ SECTION -->
+        <section class="py-20 border-b border-zinc-800 bg-zinc-950">
+            <div class="max-w-4xl mx-auto px-4 sm:px-6">
+                <div class="text-center mb-12">
+                    <div class="text-xs font-mono text-brand-500 uppercase tracking-widest mb-2">// Вопросы и ответы</div>
+                    <h2 class="text-2xl sm:text-3xl font-light text-white">Часто задаваемые вопросы</h2>
+                </div>
+
+                <div class="space-y-4">
+                    <!-- FAQ 1 -->
+                    <div class="border border-zinc-800 bg-zinc-900/50 rounded-sm overflow-hidden">
+                        <button onclick="toggleFaq(this)" class="w-full text-left p-5 flex justify-between items-center text-sm font-medium text-white hover:text-brand-500 transition-colors">
+                            <span>Вы работаете удаленно по другим городам и странам?</span>
+                            <span class="faq-icon text-brand-500 font-mono text-lg">+</span>
+                        </button>
+                        <div class="faq-answer hidden px-5 pb-5 text-xs text-zinc-400 leading-relaxed border-t border-zinc-800/50 pt-3">
+                            Да, более 60% наших проектов реализуются удаленно. Мы используем BIM-облако Autodesk, проводим видеоконференции в Zoom/Google Meet и передаем всю документацию в электронном виде высокого разрешения и исходниках.
+                        </div>
+                    </div>
+
+                    <!-- FAQ 2 -->
+                    <div class="border border-zinc-800 bg-zinc-900/50 rounded-sm overflow-hidden">
+                        <button onclick="toggleFaq(this)" class="w-full text-left p-5 flex justify-between items-center text-sm font-medium text-white hover:text-brand-500 transition-colors">
+                            <span>В каких программах ведется проектирование?</span>
+                            <span class="faq-icon text-brand-500 font-mono text-lg">+</span>
+                        </button>
+                        <div class="faq-answer hidden px-5 pb-5 text-xs text-zinc-400 leading-relaxed border-t border-zinc-800/50 pt-3">
+                            Основной BIM-пакет — Autodesk Revit. 3D-визуализация выполняется в 3ds Max + Corona Renderer / Lumion. Вы получите файлы IFC, DWG (AutoCAD), PDF альбомы и 3D-модель для просмотра на мобильных устройствах.
+                        </div>
+                    </div>
+
+                    <!-- FAQ 3 -->
+                    <div class="border border-zinc-800 bg-zinc-900/50 rounded-sm overflow-hidden">
+                        <button onclick="toggleFaq(this)" class="w-full text-left p-5 flex justify-between items-center text-sm font-medium text-white hover:text-brand-500 transition-colors">
+                            <span>Как происходит оплата?</span>
+                            <span class="faq-icon text-brand-500 font-mono text-lg">+</span>
+                        </button>
+                        <div class="faq-answer hidden px-5 pb-5 text-xs text-zinc-400 leading-relaxed border-t border-zinc-800/50 pt-3">
+                            Оплата разбивается на 3 этапа: 40% предоплата при подписании договора, 30% после утверждения 3D-визуализации и эскиза, и 30% при сдаче готового комплекта чертежей АР/КР.
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+
+        <!-- CONTACTS SECTION -->
+        <section id="contacts" class="py-24 bg-zinc-900/30">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                <div class="grid lg:grid-cols-12 gap-12 items-center">
+                    
+                    <div class="lg:col-span-6 space-y-6">
+                        <div class="text-xs font-mono text-brand-500 uppercase tracking-widest">// Связь с нами</div>
+                        <h2 class="text-3xl sm:text-4xl font-light text-white">Обсудим ваш будущий объект?</h2>
+                        <p class="text-sm text-zinc-400 leading-relaxed">
+                            Свяжитесь с нами прямым сообщением в мессенджере или оставьте контакты для звонка главного архитектора.
+                        </p>
+
+                        <!-- Messengers Buttons -->
+                        <div class="flex flex-wrap gap-4 pt-2">
+                            <a href="https://t.me/Artem_020" target="_blank" rel="noopener" class="inline-flex items-center gap-3 px-6 py-3.5 bg-[#229ED9]/10 border border-[#229ED9]/40 text-[#229ED9] hover:bg-[#229ED9] hover:text-white transition-all text-xs font-mono font-semibold rounded-sm">
+                                <svg class="w-4 h-4 fill-current" viewBox="0 0 24 24"><path d="M12 0C5.37 0 0 5.37 0 12s5.37 12 12 12 12-5.37 12-12S18.63 0 12 0zm5.562 8.161c-.18.717-.962 4.084-1.362 5.462-.168.581-.383.776-.589.795-.449.041-.79-.296-1.225-.581-.681-.447-1.066-.724-1.727-1.159-.764-.503-.269-.78.167-1.233.114-.118 2.093-1.919 2.131-2.083.005-.02.009-.098-.037-.139s-.112-.027-.161-.016c-.069.016-1.171.745-3.305 2.186-.313.215-.595.321-.848.315-.279-.006-.816-.157-1.215-.287-.49-.159-.878-.243-.844-.513.018-.14.212-.284.582-.432 2.278-.992 3.8-1.647 4.566-1.964 2.174-.903 2.626-1.06 2.92-1.065.065-.001.21.015.304.092.08.065.102.153.111.215.009.062.02.203.011.314z"/></svg>
+                                <span>Написать в Telegram</span>
+                            </a>
+
+                            <a href="https://whatsapp.com" target="_blank" rel="noopener" class="inline-flex items-center gap-3 px-6 py-3.5 bg-[#25D366]/10 border border-[#25D366]/40 text-[#25D366] hover:bg-[#25D366] hover:text-white transition-all text-xs font-mono font-semibold rounded-sm">
+                                <svg class="w-4 h-4 fill-current" viewBox="0 0 24 24"><path d="M.057 24l1.687-6.163c-1.041-1.804-1.588-3.849-1.587-5.946.003-6.556 5.338-11.891 11.893-11.891 3.181.001 6.167 1.24 8.413 3.488 2.245 2.248 3.481 5.236 3.48 8.414-.003 6.557-5.338 11.892-11.893 11.892-1.99-.001-3.951-.5-5.688-1.448l-6.305 1.654zm6.597-3.807c1.676.995 3.276 1.591 5.392 1.592 5.448 0 9.886-4.434 9.889-9.885.002-5.462-4.415-9.89-9.881-9.892-5.452 0-9.887 4.434-9.889 9.884-.001 2.225.651 3.891 1.746 5.634l-.999 3.648 3.742-.981z"/></svg>
+                                <span>Написать в WhatsApp</span>
+                            </a>
+                        </div>
+
+                        <!-- Info details -->
+                        <div class="grid grid-cols-2 gap-4 pt-6 text-xs border-t border-zinc-800">
+                            <div>
+                                <span class="text-zinc-500 font-mono">Прямой телефон:</span>
+                                <p class="text-white font-mono font-medium text-sm mt-1">+375 (33) 916-76-00</p>
+                            </div>
+                            <div>
+                                <span class="text-zinc-500 font-mono">Электронная почта:</span>
+                                <p class="text-white font-mono font-medium text-sm mt-1">project@nexus-arch.ru</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Right Office Card -->
+                    <div class="lg:col-span-6 bg-zinc-950 border border-zinc-800 p-8 rounded-sm">
+                        <div class="text-xs font-mono text-zinc-500 uppercase mb-2">Главный офис / Студия</div>
+                        <h3 class="text-xl font-medium text-white mb-4">Минск, Пр.Независимости, 148к2,каб611а</h3>
+                        <p class="text-xs text-zinc-400 mb-6 leading-relaxed">
+                            Прием клиентов проводится по предварительной записи. Вы можете записаться на личную презентацию BIM-проектов и образцов отделочных материалов.
+                        </p>
+                        <div class="aspect-video w-full bg-zinc-900 border border-zinc-800 rounded overflow-hidden relative flex items-center justify-center text-xs font-mono text-zinc-500">
+                            <!-- Placeholder architectural map grid -->
+                            <div class="absolute inset-0 bg-grid-pattern opacity-60"></div>
+                            <div class="relative z-10 text-center p-4">
+                                <span class="w-3 h-3 rounded-full bg-brand-500 inline-block mb-2 animate-ping"></span>
+                                <p class="text-zinc-300 font-semibold">NEXUS ARCH STUDIO</p>
+                                <p class="text-[10px] text-zinc-400 mt-1">Координаты: 55.7495° N, 37.5371° E</p>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <!-- FOOTER -->
+    <footer class="bg-zinc-950 border-t border-zinc-900 py-10 text-xs text-zinc-400">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col sm:flex-row items-center justify-between gap-4">
+            <div class="flex items-center gap-3">
+                <span class="font-bold tracking-widest text-white uppercase">NEXUS<span class="text-brand-500">.</span>ARCH</span>
+                <span>© 2026. Все права защищены.</span>
+            </div>
+            <div class="flex items-center gap-6 text-zinc-400 font-mono">
+                <a href="#" class="hover:text-white transition-colors">Политика конфиденциальности</a>
+                <a href="#" class="hover:text-white transition-colors">BIM Стандарты</a>
+            </div>
+        </div>
+    </footer>
+
+
+    <!-- PROJECT DETAIL MODAL -->
+    <div id="project-modal" class="fixed inset-0 z-50 hidden bg-zinc-950/90 backdrop-blur-md flex items-center justify-center p-4 sm:p-6 overflow-y-auto">
+        <div class="bg-zinc-900 border border-zinc-800 rounded-sm max-w-4xl w-full max-h-[90vh] overflow-y-auto relative p-6 sm:p-8 shadow-2xl">
+            <!-- Close button -->
+            <button onclick="closeProjectModal()" class="absolute top-4 right-4 text-zinc-400 hover:text-white p-2 text-xl font-mono">✕</button>
+
+            <div id="modal-content">
+                <!-- Dynamic Content Injected via JS -->
+            </div>
+        </div>
+    </div>
+
+
+    <!-- SUCCESS TOAST / MODAL -->
+    <div id="success-toast" class="fixed bottom-6 right-6 z-50 hidden bg-zinc-900 border-2 border-brand-500 text-white p-6 rounded-sm shadow-2xl max-w-md">
+        <div class="flex items-start gap-4">
+            <div class="w-8 h-8 rounded-full bg-brand-500 text-zinc-950 flex items-center justify-center font-bold font-mono">✓</div>
+            <div>
+                <h4 class="font-semibold text-sm mb-1 text-brand-500">Заявка успешно принята!</h4>
+                <p class="text-xs text-zinc-300 leading-relaxed" id="toast-message">Спасибо. Главный архитектор проекта свяжется с вами по указанному контакту в течение 30 минут.</p>
+                <button onclick="closeToast()" class="mt-4 px-4 py-1.5 bg-zinc-800 hover:bg-zinc-700 text-xs font-mono rounded">Закрыть</button>
+            </div>
+        </div>
+    </div>
+
+
+    <!-- JAVASCRIPT INTERACTION LOGIC -->
+    <script>
+        // Database of Projects for Modal Details
+        const projectsData = {
+            1: {
+                title: "Residence Mono",
+                category: "Частный двухэтажный дом",
+                area: "320 м²",
+                location: "Московская область, КП Николина Гора",
+                year: "2025",
+                tech: "Revit, 3ds Max + Corona, Lumion 3D",
+                image: "https://images.unsplash.com/photo-1600596542815-ffad4c1539a9?auto=format&fit=crop&w=1200&q=80",
+                description: "Минималистичная частная резиденция из монолитного архитектурного бетона с интегрированной климатической системой. На первом этаже расположена просторная двусветная гостиная с камином и панорамным остеклением Schüco.",
+                deliverables: ["Раздел АР (Архитектурные решения)", "3D Визуализация интерьеров и фасадов", "Раздел КР (Конструкции железобетонные)"]
+            },
+            2: {
+                title: "Nordic Cabin Suite",
+                category: "Барнхаус / Эко-вилла",
+                area: "180 м²",
+                location: "Ленинградская область, Приозерск",
+                year: "2025",
+                tech: "Revit (LOD 400), Archicad",
+                image: "https://images.unsplash.com/photo-1512917774080-9991f1c4c750?auto=format&fit=crop&w=1200&q=80",
+                description: "Дом в скандинавском стиле на сложном рельефе с открытой консольной террасой. Проект выполнен с высокими требованиями к энергоэффективности и теплоизоляции.",
+                deliverables: ["Полная BIM-модель Revit", "Рабочая документация каркаса", "Спецификация фасадных материалов"]
+            },
+            3: {
+                title: "Villa Horizon",
+                category: "Премиальная вилла",
+                area: "540 м²",
+                location: "Сочи, Красная Поляна",
+                year: "2024",
+                tech: "3ds Max, Corona, Photoshop, Revit",
+                image: "https://images.unsplash.com/photo-1600607687939-ce8a6c25118c?auto=format&fit=crop&w=1200&q=80",
+                description: "Вилла каскадного типа на горном склоне. Проект включает консольный бассейн с эффектом бесконечности (Infinity pool) и подземную парковку на 4 авто.",
+                deliverables: ["Фотореалистичная 3D Визуализация (12 ракурсов)", "Концепция ландшафта", "Эскизный проект"]
+            },
+            4: {
+                title: "BIM Office Pavilion",
+                category: "Коммерческий павильон",
+                area: "1200 м²",
+                location: "Москва, Сколково",
+                year: "2025",
+                tech: "Revit, Navisworks, Rhino/Grasshopper",
+                image: "https://images.unsplash.com/photo-1503387762-592deb58ef4e?auto=format&fit=crop&w=1200&q=80",
+                description: "Проектирование общественного выставочного пространства с параметрическим металлическим каркасом и консольными балкам с пролетом 24 метра.",
+                deliverables: ["BIM Координация АР+КР+ИОС", "Проверка коллизий в Navisworks", "Спецификации стального проката"]
+            },
+            5: {
+                title: "Glasshouse Residence",
+                category: "Современный жилой дом",
+                area: "290 м²",
+                location: "Екатеринбург",
+                year: "2024",
+                tech: "Revit, Lumion 3D",
+                image: "https://images.unsplash.com/photo-1600210492486-724fe5c67fb0?auto=format&fit=crop&w=1200&q=80",
+                description: "Жилой дом с атриумом в центре, пропускающим естественный свет во все помещения первого и второго этажа.",
+                deliverables: ["Архитектурно-строительный проект", "Паспорт фасада", "План инсоляции"]
+            },
+            6: {
+                title: "Atrium Courtyard",
+                category: "Частный дом с внутренним двором",
+                area: "410 м²",
+                location: "Казань",
+                year: "2025",
+                tech: "Revit, 3ds Max",
+                image: "https://images.unsplash.com/photo-1600585152220-90363fe7e115?auto=format&fit=crop&w=1200&q=80",
+                description: "Замкнутый архитектурный объем, обеспечивающий абсолютную приватность жизни семьи от внешнего окружения.",
+                deliverables: ["Проект АР", "Проект КР", "3D-визуализация и интерьер"]
+            }
+        };
+
+        // Mobile Menu Toggle
+        const menuBtn = document.getElementById('mobile-menu-btn');
+        const mobileMenu = document.getElementById('mobile-menu');
+        const iconOpen = document.getElementById('menu-icon-open');
+        const iconClose = document.getElementById('menu-icon-close');
+
+        menuBtn.addEventListener('click', () => {
+            const isHidden = mobileMenu.classList.contains('hidden');
+            if (isHidden) {
+                mobileMenu.classList.remove('hidden');
+                iconOpen.classList.add('hidden');
+                iconClose.classList.remove('hidden');
+            } else {
+                mobileMenu.classList.add('hidden');
+                iconOpen.classList.remove('hidden');
+                iconClose.classList.add('hidden');
+            }
+        });
+
+        document.querySelectorAll('.mobile-link').forEach(link => {
+            link.addEventListener('click', () => {
+                mobileMenu.classList.add('hidden');
+                iconOpen.classList.remove('hidden');
+                iconClose.classList.add('hidden');
+            });
+        });
+
+        // Portfolio Filtering Logic
+        const filterBtns = document.querySelectorAll('.filter-btn');
+        const projectCards = document.querySelectorAll('.project-card');
+
+        filterBtns.forEach(btn => {
+            btn.addEventListener('click', () => {
+                filterBtns.forEach(b => {
+                    b.classList.remove('active', 'border-brand-500', 'bg-brand-500', 'text-zinc-950', 'font-semibold');
+                    b.classList.add('border-zinc-800', 'bg-zinc-900', 'text-zinc-400');
+                });
+                btn.classList.add('active', 'border-brand-500', 'bg-brand-500', 'text-zinc-950', 'font-semibold');
+                btn.classList.remove('border-zinc-800', 'bg-zinc-900', 'text-zinc-400');
+
+                const filterValue = btn.getAttribute('data-filter');
+
+                projectCards.forEach(card => {
+                    const categories = card.getAttribute('data-category');
+                    if (filterValue === 'all' || categories.includes(filterValue)) {
+                        card.style.display = 'block';
+                    } else {
+                        card.style.display = 'none';
+                    }
+                });
+            });
+        });
+
+        // Price Calculator Calculation Logic
+        const packageRates = {
+            'concept': 20,
+            'ar': 32,
+            'full': 50
+        };
+
+        function updateArea(val) {
+            document.getElementById('area-val').innerText = val + ' м²';
+            calculateTotal();
+        }
+
+        function selectPackage(pkgKey) {
+            document.getElementById('package-select').value = pkgKey;
+            calculateTotal();
+        }
+
+        function calculateTotal() {
+            const area = parseInt(document.getElementById('area-range').value);
+            const packageKey = document.getElementById('package-select').value;
+            const rate = packageRates[packageKey] || 32;
+            
+            let baseTotal = area * rate;
+
+            // Optional add-ons
+            if (document.getElementById('opt-surveillance').checked) {
+                baseTotal += 500;
+            }
+            if (document.getElementById('opt-video').checked) {
+                baseTotal += 400;
+            }
+
+            // Estimate project duration
+            let daysMin = Math.round(area * 0.08) + 15;
+            let daysMax = daysMin + 12;
+
+            // Formatted price update
+            document.getElementById('total-price').innerText = baseTotal.toLocaleString('ru-RU') + ' $';
+            document.getElementById('price-per-m').innerText = rate.toLocaleString('ru-RU') + ' $ / м²';
+            document.getElementById('est-time').innerText = `${daysMin}–${daysMax} рабочих дней`;
+        }
+
+        // Form Submit Handler
+        function handleFormSubmit(event) {
+            event.preventDefault();
+            
+            const name = document.getElementById('client-name').value;
+            const phone = document.getElementById('client-phone').value;
+            const area = document.getElementById('area-range').value;
+            const total = document.getElementById('total-price').innerText;
+
+            document.getElementById('toast-message').innerHTML = `Уважаемый(ая) <strong>${name}</strong>, ваш предварительный расчёт на <strong>${area} м²</strong> (${total}) отправлен в обработку. За вами закреплен инженер-архитектор.`;
+            
+            const toast = document.getElementById('success-toast');
+            toast.classList.remove('hidden');
+
+            document.getElementById('order-form').reset();
+            calculateTotal();
+
+            setTimeout(() => {
+                toast.classList.add('hidden');
+            }, 10000);
+        }
+
+        function closeToast() {
+            document.getElementById('success-toast').classList.add('hidden');
+        }
+
+        // Modal Project Details Popup
+        function openProjectModal(id) {
+            const project = projectsData[id];
+            if (!project) return;
+
+            const modalContent = document.getElementById('modal-content');
+            modalContent.innerHTML = `
+                <div class="space-y-6">
+                    <div class="relative h-[320px] rounded overflow-hidden">
+                        <img src="${project.image}" alt="${project.title}" class="w-full h-full object-cover">
+                        <div class="absolute bottom-4 left-4 bg-zinc-950/80 px-3 py-1 font-mono text-xs text-brand-500 rounded border border-zinc-800">
+                            ${project.category}
+                        </div>
+                    </div>
+
+                    <div class="flex flex-col sm:flex-row sm:items-center justify-between border-b border-zinc-800 pb-4 gap-2">
+                        <div>
+                            <h3 class="text-2xl font-light text-white">${project.title}</h3>
+                            <p class="text-xs text-zinc-400 mt-0.5">${project.location}</p>
+                        </div>
+                        <div class="text-left sm:text-right font-mono text-xs text-brand-500">
+                            <span>Площадь: ${project.area}</span><br>
+                            <span class="text-zinc-400">Год: ${project.year}</span>
+                        </div>
+                    </div>
+
+                    <div>
+                        <h4 class="text-xs font-mono uppercase text-zinc-400 mb-2">Описание объекта</h4>
+                        <p class="text-xs sm:text-sm text-zinc-300 leading-relaxed">${project.description}</p>
+                    </div>
+
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 pt-2">
+                        <div class="bg-zinc-950 p-4 border border-zinc-800 rounded">
+                            <h4 class="text-xs font-mono uppercase text-brand-500 mb-2">Состав рабочей документации</h4>
+                            <ul class="space-y-1.5 text-xs text-zinc-300">
+                                ${project.deliverables.map(item => `<li class="flex items-center gap-2"><span>•</span> ${item}</li>`).join('')}
+                            </ul>
+                        </div>
+                        <div class="bg-zinc-950 p-4 border border-zinc-800 rounded">
+                            <h4 class="text-xs font-mono uppercase text-brand-500 mb-2">Использованный софт</h4>
+                            <p class="text-xs font-mono text-zinc-300">${project.tech}</p>
+                        </div>
+                    </div>
+
+                    <div class="pt-4 flex justify-end">
+                        <a href="#calculator" onclick="closeProjectModal()" class="px-6 py-3 bg-brand-500 text-zinc-950 font-mono text-xs font-bold uppercase rounded hover:bg-brand-600 transition-colors">
+                            Заказать похожий проект
+                        </a>
+                    </div>
+                </div>
+            `;
+
+            document.getElementById('project-modal').classList.remove('hidden');
+        }
+
+        function closeProjectModal() {
+            document.getElementById('project-modal').classList.add('hidden');
+        }
+
+        // Close modal on outside backdrop click
+        document.getElementById('project-modal').addEventListener('click', (e) => {
+            if (e.target.id === 'project-modal') {
+                closeProjectModal();
+            }
+        });
+
+        // FAQ Toggle Accordion
+        function toggleFaq(btn) {
+            const answer = btn.nextElementSibling;
+            const icon = btn.querySelector('.faq-icon');
+            
+            if (answer.classList.contains('hidden')) {
+                answer.classList.remove('hidden');
+                icon.innerText = '−';
+            } else {
+                answer.classList.add('hidden');
+                icon.innerText = '+';
+            }
+        }
+
+        // Initial Calculation Trigger
+        calculateTotal();
+    </script>
+
+</body>
+</html>
